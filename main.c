@@ -9,7 +9,7 @@
 #include <xc.h>
 #include <stdint.h>
 
-#include "glcd_lib.h"
+#include "glcd128x64/glcd_lib.h"
 
 /* GLCD details for EasyPIC
  * 
