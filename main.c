@@ -47,6 +47,14 @@ void main(void) {
     __delay_ms(100);
     glcd_on();
     glcd_clear();
+    glcd_systext(13,16,"GLCD Draw library",17);
+    glcd_systext(28,32,"Oliver Broad",12);
+    for(uint8_t d=0;d<=50;d++)
+    {
+        __delay_ms(100);
+    }
+    glcd_clear();
+    
     for(uint8_t x=0;x<64;x++)
         glcd_vline(x+32,x,63-x,1);
     for(uint8_t x=4;x<28;x++)
