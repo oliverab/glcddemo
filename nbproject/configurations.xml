@@ -207,6 +207,12 @@
         <property key="user-pack-device-support" value=""/>
       </XC8-config-global>
       <item path="configk42.c" ex="true" overriding="false">
+        <HI-TECH-COMP>
+        </HI-TECH-COMP>
+        <HI-TECH-LINK>
+        </HI-TECH-LINK>
+        <XC8-config-global>
+        </XC8-config-global>
       </item>
     </conf>
     <conf name="46K42" type="2">
@@ -382,6 +388,12 @@
         <property key="user-pack-device-support" value=""/>
       </XC8-config-global>
       <item path="configk22.c" ex="true" overriding="false">
+        <HI-TECH-COMP>
+        </HI-TECH-COMP>
+        <HI-TECH-LINK>
+        </HI-TECH-LINK>
+        <XC8-config-global>
+        </XC8-config-global>
       </item>
     </conf>
   </confs>
