@@ -112,6 +112,11 @@ void main(void) {
     __delay_ms(200);
     glcd_clear();
     glcd_fill_circle(64,32,30,1);
+    for(uint8_t l=1;l<=64;l++)
+    {
+        glcd_set_start_line(l);
+            __delay_ms(100);
+    }
     TRISD=0x00;
     while (1)
     {
