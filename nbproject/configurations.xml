@@ -6,9 +6,9 @@
                    projectFiles="true">
       <logicalFolder name="f1" displayName="glcd128x64" projectFiles="true">
         <itemPath>glcd128x64/glcd_lib.h</itemPath>
+        <itemPath>glcd128x64/systfont.h</itemPath>
       </logicalFolder>
       <itemPath>glcd_hardware.h</itemPath>
-      <itemPath>glcd128x64/systfont.h</itemPath>
     </logicalFolder>
     <logicalFolder name="LinkerScript"
                    displayName="Linker Files"
