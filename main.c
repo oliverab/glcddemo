@@ -117,6 +117,22 @@ void main(void) {
         glcd_set_start_line(l);
             __delay_ms(100);
     }
+    __delay_ms(200);
+    __delay_ms(200);
+    __delay_ms(200);
+    __delay_ms(200);
+    __delay_ms(200);
+    __delay_ms(200);
+    __delay_ms(200);
+    __delay_ms(200);
+    __delay_ms(200);
+    __delay_ms(200);
+    __delay_ms(200);
+    glcd_clear();
+    for(uint8_t r=5;r<=30;r+=5)
+    {
+        glcd_fill_donut(64,32,r,r-1,1);
+    }
     TRISD=0x00;
     while (1)
     {
