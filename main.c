@@ -111,7 +111,7 @@ void main(void) {
     __delay_ms(200);
     __delay_ms(200);
     glcd_clear();
-    glcd_fill_circle(64,32,30,1);
+    glcd_fill_donut(64,32,30,20,1);
     for(uint8_t l=1;l<=64;l++)
     {
         glcd_set_start_line(l);
