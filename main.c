@@ -131,7 +131,7 @@ void main(void) {
     glcd_clear();
     for(uint8_t r=5;r<=30;r+=5)
     {
-        glcd_fill_donut(64,32,r,r-1,1);
+        glcd_circle(64,32,r,1);
     }
     TRISD=0x00;
     while (1)
