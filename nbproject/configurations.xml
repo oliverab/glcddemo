@@ -10,6 +10,7 @@
         <itemPath>glcd128x64/glcd_hardware_sample.h</itemPath>
       </logicalFolder>
       <itemPath>glcd_hardware.h</itemPath>
+      <itemPath>lgfont.h</itemPath>
     </logicalFolder>
     <logicalFolder name="LinkerScript"
                    displayName="Linker Files"
@@ -25,11 +26,13 @@
       <itemPath>main.c</itemPath>
       <itemPath>configk22.c</itemPath>
       <itemPath>configk42.c</itemPath>
+      <itemPath>lgfont.c</itemPath>
     </logicalFolder>
     <logicalFolder name="ExternalFiles"
                    displayName="Important Files"
                    projectFiles="false">
       <itemPath>Makefile</itemPath>
+      <itemPath>Doxyfile</itemPath>
     </logicalFolder>
   </logicalFolder>
   <sourceRootList>

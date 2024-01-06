@@ -10,6 +10,20 @@
 #include <stdint.h>
 
 #include "glcd128x64/glcd_lib.h"
+#include "lgfont.h"
+#include "glcd_hardware.h"
+#define glcd_cs1 0b00000001
+#define glcd_cs2 0b00000010
+#define glcd_rs  0b00000100
+#define glcd_rw  0b00001000
+#define glcd_e   0b00010000
+#define glcd_rst 0b00100000
+
+#define glcdc_off 0b00111110
+#define glcdc_on 0b00111111
+#define glcdc_y  0b01000000
+#define glcdc_x  0b10111000
+#define glcd_setstart 0b11000000
 
 /* GLCD details for EasyPIC
  * 
@@ -34,6 +48,331 @@
  *  19	LED+
  *  20	LED-
  */
+
+void glcd_lgtext(uint8_t x,uint8_t y,const char *tx,uint8_t c)
+{
+    //uint8_t d;
+    if (x>0x7f || y>0x3f) return;
+    if (x&0x40) {
+        glcdcont_set(glcd_cs1);
+        glcdcont_unset(glcd_cs2);
+    } else {
+        glcdcont_unset(glcd_cs1);
+        glcdcont_set(glcd_cs2);
+    }
+    glcdcont_unset(glcd_rs);
+    glcddata_write((uint8_t)(glcdc_x|((y>>3)&7)));
+    glcdcont_set(glcd_e);
+    glcd_wait();
+    glcdcont_unset(glcd_e);
+    glcd_wait();
+    glcddata_write((uint8_t)(glcdc_y|(x&0x3f)));
+    glcdcont_set(glcd_e);
+    glcd_wait();
+    glcdcont_unset(glcd_e);
+    glcd_wait();
+
+    glcdcont_set(glcd_rs);
+
+    for (;c>0;c--)
+    {
+        for(uint8_t d=0;d<=5;d++ )
+        {
+            glcddata_write(Terminal12x16[(unsigned short) (*tx-32)*6+d]);
+            glcdcont_set(glcd_e);
+            glcd_wait();
+            glcdcont_unset(glcd_e);
+            glcd_wait();
+            x++;
+            if (x==0x40)
+            {
+                glcdcont_set(glcd_cs1);
+                glcdcont_unset(glcd_cs2);
+                glcdcont_unset(glcd_rs);
+                glcddata_write((uint8_t)(glcdc_x|((y>>3)&7)));
+                glcdcont_set(glcd_e);
+                glcd_wait();
+                glcdcont_unset(glcd_e);
+                glcd_wait();
+                glcddata_write((uint8_t)(glcdc_y|0x00));
+                glcdcont_set(glcd_e);
+                glcd_wait();
+                glcdcont_unset(glcd_e);
+                glcd_wait();
+                
+                glcdcont_set(glcd_rs);                               
+            }
+            if (x==0x80) break;
+        }
+        if (x==0x80) break;
+        tx++;
+    }
+    glcdcont_unset(glcd_rs);
+
+}
+void glcd_adv_lgtext(uint8_t x,uint8_t y,const char *tx,uint8_t c)
+{
+    uint8_t buf[5];
+    //uint8_t d;
+    if (x>0x7f || y>0x3f) return;
+
+    for (; c > 0; c--) {
+        if ((y & 0b111) && (y<0x38))
+        {
+        if (x & 0x40) {
+            glcdcont_set(glcd_cs1);
+            glcdcont_unset(glcd_cs2);
+        } else {
+            glcdcont_unset(glcd_cs1);
+            glcdcont_set(glcd_cs2);
+        }
+        glcdcont_unset(glcd_rs);
+        glcddata_write((uint8_t) (glcdc_x | (((y >> 3)&7))+1));
+        glcdcont_set(glcd_e);
+        glcd_wait();
+        glcdcont_unset(glcd_e);
+        glcd_wait();
+        glcddata_write((uint8_t) (glcdc_y | (x & 0x3f)));
+        glcdcont_set(glcd_e);
+        glcd_wait();
+        glcdcont_unset(glcd_e);
+        glcd_wait();
+
+        glcdcont_set(glcd_rs);
+        glcddata_wr_tris(0xff);
+        glcdcont_set(glcd_rw);
+        glcdcont_set(glcd_e);
+        glcd_wait();
+        glcdcont_unset(glcd_e);
+        glcd_wait();
+
+        for(uint8_t d=0;d<=5;d++ )
+        {
+            glcdcont_set(glcd_e);
+            glcd_wait();
+            buf[d]=glcddata_read();
+            glcdcont_unset(glcd_e);
+            glcd_wait();
+            if (x+d==0x3f)
+            {
+                glcdcont_unset(glcd_rw);
+                glcddata_wr_tris(0x00);
+                glcdcont_set(glcd_cs1);
+                glcdcont_unset(glcd_cs2);
+                glcdcont_unset(glcd_rs);
+                glcddata_write((uint8_t)(glcdc_x|(((y>>3)&7)+1)));
+                glcdcont_set(glcd_e);
+                glcd_wait();
+                glcdcont_unset(glcd_e);
+                glcd_wait();
+                glcddata_write((uint8_t)(glcdc_y|0x00));
+                glcdcont_set(glcd_e);
+                glcd_wait();
+                glcdcont_unset(glcd_e);
+                glcd_wait();
+                
+                glcdcont_set(glcd_rs);   
+                glcddata_wr_tris(0xff);
+                glcdcont_set(glcd_rw);
+                glcdcont_set(glcd_e);
+                glcd_wait();
+                glcdcont_unset(glcd_e);
+                glcd_wait();
+
+            }
+            if (x+d==0xff) break;
+        }
+        glcdcont_unset(glcd_rw);
+        glcddata_wr_tris(0x00);
+
+        if (x & 0x40) {
+            glcdcont_set(glcd_cs1);
+            glcdcont_unset(glcd_cs2);
+        } else {
+            glcdcont_unset(glcd_cs1);
+            glcdcont_set(glcd_cs2);
+        }
+        glcdcont_unset(glcd_rs);
+        glcddata_write((uint8_t) (glcdc_x | (((y >> 3)&7)+1)));
+        glcdcont_set(glcd_e);
+        glcd_wait();
+        glcdcont_unset(glcd_e);
+        glcd_wait();
+        glcddata_write((uint8_t) (glcdc_y | (x & 0x3f)));
+        glcdcont_set(glcd_e);
+        glcd_wait();
+        glcdcont_unset(glcd_e);
+        glcd_wait();
+
+        glcdcont_set(glcd_rs);
+
+        for(uint8_t d=0;d<=5;d++ )
+        {
+            uint8_t yy=8-(y&0b111);
+            uint8_t bb=buf[d];
+            bb &=~(0xff>>yy);
+            bb |=Terminal12x16[(unsigned short) (*tx-32)*6+d]>>yy;
+            
+            glcddata_write(bb);
+            glcdcont_set(glcd_e);
+            glcd_wait();
+            glcdcont_unset(glcd_e);
+            glcd_wait();
+            if (x+d==0x3f)
+            {
+                glcdcont_set(glcd_cs1);
+                glcdcont_unset(glcd_cs2);
+                glcdcont_unset(glcd_rs);
+                glcddata_write((uint8_t)(glcdc_x|(((y>>3)&7)+1)));
+                glcdcont_set(glcd_e);
+                glcd_wait();
+                glcdcont_unset(glcd_e);
+                glcd_wait();
+                glcddata_write((uint8_t)(glcdc_y|0x00));
+                glcdcont_set(glcd_e);
+                glcd_wait();
+                glcdcont_unset(glcd_e);
+                glcd_wait();
+                
+                glcdcont_set(glcd_rs);                               
+            }
+            if (x+d==0xff) break;
+        }
+  
+        }
+        
+        
+        
+        if (x & 0x40) {
+            glcdcont_set(glcd_cs1);
+            glcdcont_unset(glcd_cs2);
+        } else {
+            glcdcont_unset(glcd_cs1);
+            glcdcont_set(glcd_cs2);
+        }
+        glcdcont_unset(glcd_rs);
+        glcddata_write((uint8_t) (glcdc_x | ((y >> 3)&7)));
+        glcdcont_set(glcd_e);
+        glcd_wait();
+        glcdcont_unset(glcd_e);
+        glcd_wait();
+        glcddata_write((uint8_t) (glcdc_y | (x & 0x3f)));
+        glcdcont_set(glcd_e);
+        glcd_wait();
+        glcdcont_unset(glcd_e);
+        glcd_wait();
+
+        glcdcont_set(glcd_rs);
+        glcddata_wr_tris(0xff);
+        glcdcont_set(glcd_rw);
+        glcdcont_set(glcd_e);
+        glcd_wait();
+        glcdcont_unset(glcd_e);
+        glcd_wait();
+
+        for(uint8_t d=0;d<=5;d++ )
+        {
+            glcdcont_set(glcd_e);
+            glcd_wait();
+            buf[d]=glcddata_read();
+            glcdcont_unset(glcd_e);
+            glcd_wait();
+            if (x+d==0x40)
+            {
+                glcdcont_unset(glcd_rw);
+                glcddata_wr_tris(0x00);
+                glcdcont_set(glcd_cs1);
+                glcdcont_unset(glcd_cs2);
+                glcdcont_unset(glcd_rs);
+                glcddata_write((uint8_t)(glcdc_x|((y>>3)&7)));
+                glcdcont_set(glcd_e);
+                glcd_wait();
+                glcdcont_unset(glcd_e);
+                glcd_wait();
+                glcddata_write((uint8_t)(glcdc_y|0x00));
+                glcdcont_set(glcd_e);
+                glcd_wait();
+                glcdcont_unset(glcd_e);
+                glcd_wait();
+                
+                glcdcont_set(glcd_rs);   
+                glcddata_wr_tris(0xff);
+                glcdcont_set(glcd_rw);
+                glcdcont_set(glcd_e);
+                glcd_wait();
+                glcdcont_unset(glcd_e);
+                glcd_wait();
+
+            }
+            if (x+d==0x80) break;
+        }
+        glcdcont_unset(glcd_rw);
+        glcddata_wr_tris(0x00);
+
+        if (x & 0x40) {
+            glcdcont_set(glcd_cs1);
+            glcdcont_unset(glcd_cs2);
+        } else {
+            glcdcont_unset(glcd_cs1);
+            glcdcont_set(glcd_cs2);
+        }
+        glcdcont_unset(glcd_rs);
+        glcddata_write((uint8_t) (glcdc_x | ((y >> 3)&7)));
+        glcdcont_set(glcd_e);
+        glcd_wait();
+        glcdcont_unset(glcd_e);
+        glcd_wait();
+        glcddata_write((uint8_t) (glcdc_y | (x & 0x3f)));
+        glcdcont_set(glcd_e);
+        glcd_wait();
+        glcdcont_unset(glcd_e);
+        glcd_wait();
+
+        glcdcont_set(glcd_rs);
+
+        for(uint8_t d=0;d<=5;d++ )
+        {
+            uint8_t yy=y&0b111;
+            uint8_t bb=buf[d];
+            bb &=~(0xff<<yy);
+            bb |=Terminal12x16[(unsigned short) (*tx-32)*6+d]<<yy;
+            
+            glcddata_write(bb);
+            glcdcont_set(glcd_e);
+            glcd_wait();
+            glcdcont_unset(glcd_e);
+            glcd_wait();
+            x++;
+            if (x==0x40)
+            {
+                glcdcont_set(glcd_cs1);
+                glcdcont_unset(glcd_cs2);
+                glcdcont_unset(glcd_rs);
+                glcddata_write((uint8_t)(glcdc_x|((y>>3)&7)));
+                glcdcont_set(glcd_e);
+                glcd_wait();
+                glcdcont_unset(glcd_e);
+                glcd_wait();
+                glcddata_write((uint8_t)(glcdc_y|0x00));
+                glcdcont_set(glcd_e);
+                glcd_wait();
+                glcdcont_unset(glcd_e);
+                glcd_wait();
+                
+                glcdcont_set(glcd_rs);                               
+            }
+            if (x==0x80) break;
+        }
+        if (x==0x80) break;
+        tx++;
+    }
+    glcdcont_unset(glcd_rs);
+
+}
+
+
+
+
 void main(void) {
     ANSELD=0;
     //OSCCON NEEDED FOR PIC18F45K22
