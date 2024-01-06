@@ -73,18 +73,21 @@ void glcd_lgtext(uint8_t x,uint8_t y,const char *tx,uint8_t c)
     glcd_wait();
 
     glcdcont_set(glcd_rs);
-
+    uint8_t xx=x;
+    const char* ttx = tx;
     for (;c>0;c--)
     {
-        for(uint8_t d=0;d<=5;d++ )
+        uint8_t* addr=&Terminal12x16[(unsigned short) (*ttx-32)*(12*2+1)+1];
+        for(uint8_t d=0;d<=11;d++ )
         {
-            glcddata_write(Terminal12x16[(unsigned short) (*tx-32)*6+d]);
+            glcddata_write(*addr);
+            addr+=2;
             glcdcont_set(glcd_e);
             glcd_wait();
             glcdcont_unset(glcd_e);
             glcd_wait();
-            x++;
-            if (x==0x40)
+            xx++;
+            if (xx==0x40)
             {
                 glcdcont_set(glcd_cs1);
                 glcdcont_unset(glcd_cs2);
@@ -102,10 +105,71 @@ void glcd_lgtext(uint8_t x,uint8_t y,const char *tx,uint8_t c)
                 
                 glcdcont_set(glcd_rs);                               
             }
-            if (x==0x80) break;
+            if (xx==0x80) break;
         }
-        if (x==0x80) break;
-        tx++;
+        if (xx==0x80) break;
+        ttx++;
+    }
+    glcdcont_unset(glcd_rs);
+    y+=8;
+    if (x>0x7f || y>0x3f) return;
+    if (x&0x40) {
+        glcdcont_set(glcd_cs1);
+        glcdcont_unset(glcd_cs2);
+    } else {
+        glcdcont_unset(glcd_cs1);
+        glcdcont_set(glcd_cs2);
+    }
+    glcdcont_unset(glcd_rs);
+    glcddata_write((uint8_t)(glcdc_x|((y>>3)&7)));
+    glcdcont_set(glcd_e);
+    glcd_wait();
+    glcdcont_unset(glcd_e);
+    glcd_wait();
+    glcddata_write((uint8_t)(glcdc_y|(x&0x3f)));
+    glcdcont_set(glcd_e);
+    glcd_wait();
+    glcdcont_unset(glcd_e);
+    glcd_wait();
+
+    glcdcont_set(glcd_rs);
+    xx=x;
+    ttx=tx;
+
+    for (;c>0;c--)
+    {
+        uint8_t* addr=&Terminal12x16[(unsigned short) (*ttx-32)*(12*2+1)+2];
+        for(uint8_t d=0;d<=11;d++ )
+        {
+            glcddata_write(*addr);
+            addr+=2;
+            glcdcont_set(glcd_e);
+            glcd_wait();
+            glcdcont_unset(glcd_e);
+            glcd_wait();
+            xx++;
+            if (xx==0x40)
+            {
+                glcdcont_set(glcd_cs1);
+                glcdcont_unset(glcd_cs2);
+                glcdcont_unset(glcd_rs);
+                glcddata_write((uint8_t)(glcdc_x|((y>>3)&7)));
+                glcdcont_set(glcd_e);
+                glcd_wait();
+                glcdcont_unset(glcd_e);
+                glcd_wait();
+                glcddata_write((uint8_t)(glcdc_y|0x00));
+                glcdcont_set(glcd_e);
+                glcd_wait();
+                glcdcont_unset(glcd_e);
+                glcd_wait();
+                
+                glcdcont_set(glcd_rs);                               
+            }
+            if (xx==0x80) break;
+        }
+        if (xx==0x80) break;
+        ttx++;
     }
     glcdcont_unset(glcd_rs);
 
@@ -392,6 +456,17 @@ void main(void) {
     }
     glcd_adv_systext(14,20,"GLCD Draw library",17);
     glcd_systext(28,32,"Oliver Broad",12);
+    for(uint8_t d=0;d<=50;d++)
+    {
+        __delay_ms(100);
+    }
+    glcd_clear();
+    for(uint8_t aa=10;aa<=100;aa+=10)
+    {
+        glcd_line(10,10,aa,53,1);
+    }
+    glcd_lgtext(14,16,"Large",5);
+    glcd_lgtext(28,32,"Font",4);
     for(uint8_t d=0;d<=50;d++)
     {
         __delay_ms(100);
