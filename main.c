@@ -75,13 +75,15 @@ void glcd_lgtext(uint8_t x,uint8_t y,const char *tx,uint8_t c)
     glcdcont_set(glcd_rs);
     uint8_t xx=x;
     const char* ttx = tx;
-    for (;c>0;c--)
+    uint8_t cc=c;
+    for (;cc>0;cc--)
     {
         uint8_t* addr=&Terminal12x16[(unsigned short) (*ttx-32)*(12*2+1)+1];
         for(uint8_t d=0;d<=11;d++ )
         {
             glcddata_write(*addr);
-            addr+=2;
+            addr+=4;
+//            addr++;
             glcdcont_set(glcd_e);
             glcd_wait();
             glcdcont_unset(glcd_e);
@@ -135,14 +137,16 @@ void glcd_lgtext(uint8_t x,uint8_t y,const char *tx,uint8_t c)
     glcdcont_set(glcd_rs);
     xx=x;
     ttx=tx;
+    cc=c;
 
-    for (;c>0;c--)
+    for (;cc>0;cc--)
     {
         uint8_t* addr=&Terminal12x16[(unsigned short) (*ttx-32)*(12*2+1)+2];
         for(uint8_t d=0;d<=11;d++ )
         {
             glcddata_write(*addr);
-            addr+=2;
+            addr+=4;
+    //        addr++;
             glcdcont_set(glcd_e);
             glcd_wait();
             glcdcont_unset(glcd_e);
@@ -467,6 +471,17 @@ void main(void) {
     }
     glcd_lgtext(14,16,"Large",5);
     glcd_lgtext(28,32,"Font",4);
+   
+    while (1)
+    {
+        PORTD=0x55;
+        __delay_ms(200);
+        PORTD=~PORTD;
+        __delay_ms(200);
+    }
+
+    
+    
     for(uint8_t d=0;d<=50;d++)
     {
         __delay_ms(100);
