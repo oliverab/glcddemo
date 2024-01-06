@@ -144,8 +144,8 @@ void glcd_lgtext(uint8_t x,uint8_t y,const char *tx,uint8_t c)
         uint8_t* addr=&Terminal12x16[(unsigned short) (*ttx-32)*(12*2+1)+2];
         for(uint8_t d=0;d<=11;d++ )
         {
-            glcddata_write(*addr);
-            addr+=4;
+            glcddata_write(addr[d*4]);
+    //        addr+=4;
     //        addr++;
             glcdcont_set(glcd_e);
             glcd_wait();
