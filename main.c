@@ -48,10 +48,24 @@
  *  19	LED+
  *  20	LED-
  */
-
+struct
+{
+ uint8_t * address;
+ uint8_t offset,xs,ys,yb;
+} font ; 
+void glcd_setfont(uint8_t * address, uint8_t offset,uint8_t xs,uint8_t ys)
+{
+    font.address=address;
+    font.offset=offset;
+    font.xs=xs;
+    font.ys=ys;
+    font.yb=(ys+7) / 8;
+}
 void glcd_lgtext(uint8_t x,uint8_t y,const char *tx,uint8_t c)
 {
-    //uint8_t d;
+    uint8_t yb;
+    for (yb=1;yb<=font.yb;yb++)
+    {
     if (x>0x7f || y>0x3f) return;
     if (x&0x40) {
         glcdcont_set(glcd_cs1);
@@ -78,11 +92,11 @@ void glcd_lgtext(uint8_t x,uint8_t y,const char *tx,uint8_t c)
     uint8_t cc=c;
     for (;cc>0;cc--)
     {
-        uint8_t* addr=&Terminal12x16[(unsigned short) (*ttx-32)*(12*2+1)+1];
-        for(uint8_t d=0;d<=11;d++ )
+        uint8_t* addr=&font.address[(unsigned short) (*ttx-font.offset)*(font.xs*font.yb+1)+yb];
+        for(uint8_t d=0;d<font.xs;d++ )
         {
             glcddata_write(*addr);
-            addr+=2;
+            addr+=font.yb;
             glcdcont_set(glcd_e);
             glcd_wait();
             glcdcont_unset(glcd_e);
@@ -113,68 +127,7 @@ void glcd_lgtext(uint8_t x,uint8_t y,const char *tx,uint8_t c)
     }
     glcdcont_unset(glcd_rs);
     y+=8;
-    if (x>0x7f || y>0x3f) return;
-    if (x&0x40) {
-        glcdcont_set(glcd_cs1);
-        glcdcont_unset(glcd_cs2);
-    } else {
-        glcdcont_unset(glcd_cs1);
-        glcdcont_set(glcd_cs2);
     }
-    glcdcont_unset(glcd_rs);
-    glcddata_write((uint8_t)(glcdc_x|((y>>3)&7)));
-    glcdcont_set(glcd_e);
-    glcd_wait();
-    glcdcont_unset(glcd_e);
-    glcd_wait();
-    glcddata_write((uint8_t)(glcdc_y|(x&0x3f)));
-    glcdcont_set(glcd_e);
-    glcd_wait();
-    glcdcont_unset(glcd_e);
-    glcd_wait();
-
-    glcdcont_set(glcd_rs);
-    xx=x;
-    ttx=tx;
-    cc=c;
-
-    for (;cc>0;cc--)
-    {
-        uint8_t* addr=&Terminal12x16[(unsigned short) (*ttx-32)*(12*2+1)+2];
-        for(uint8_t d=0;d<=11;d++ )
-        {
-            glcddata_write(*addr);
-            addr+=2;
-            glcdcont_set(glcd_e);
-            glcd_wait();
-            glcdcont_unset(glcd_e);
-            glcd_wait();
-            xx++;
-            if (xx==0x40)
-            {
-                glcdcont_set(glcd_cs1);
-                glcdcont_unset(glcd_cs2);
-                glcdcont_unset(glcd_rs);
-                glcddata_write((uint8_t)(glcdc_x|((y>>3)&7)));
-                glcdcont_set(glcd_e);
-                glcd_wait();
-                glcdcont_unset(glcd_e);
-                glcd_wait();
-                glcddata_write((uint8_t)(glcdc_y|0x00));
-                glcdcont_set(glcd_e);
-                glcd_wait();
-                glcdcont_unset(glcd_e);
-                glcd_wait();
-                
-                glcdcont_set(glcd_rs);                               
-            }
-            if (xx==0x80) break;
-        }
-        if (xx==0x80) break;
-        ttx++;
-    }
-    glcdcont_unset(glcd_rs);
-
 }
 void glcd_adv_lgtext(uint8_t x,uint8_t y,const char *tx,uint8_t c)
 {
@@ -467,6 +420,7 @@ void main(void) {
     {
         glcd_line(10,10,aa,53,1);
     }
+    glcd_setfont(Terminal12x16, 32,12,16);
     glcd_lgtext(14,16,"Large",5);
     glcd_lgtext(28,32,"Font",4);
    
