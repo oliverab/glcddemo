@@ -17,7 +17,7 @@ extern "C" {
 //GLCD FontName : Sonic_XB
 //GLCD FontSize : 26 x 24
 
-extern const uint8_t Sonic_XB[];
+extern const uint8_t Sonic_XB26x24[];
 
 #ifdef	__cplusplus
 }

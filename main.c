@@ -433,7 +433,7 @@ void main(void) {
     }
     glcd_clear();
     
-    glcd_setfont(Term, 32,9,12);
+    glcd_setfont(Term9x12, 32,9,12);
     glcd_lgtext(6,0,"Large",5);
     glcd_lgtext(6,32,"Font",4);
    
@@ -443,7 +443,7 @@ void main(void) {
     }
     glcd_clear();
     
-    glcd_setfont(Sonic_XB, 32,26,24);
+    glcd_setfont(Sonic_XB26x24, 32,26,24);
     glcd_lgtext(6,0,"Huge",4);
     glcd_lgtext(6,32,"Text",4);
    

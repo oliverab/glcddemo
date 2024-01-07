@@ -19,7 +19,7 @@ extern "C" {
 
 #include <stdint.h>
 
-extern const uint8_t Term[];
+extern const uint8_t Term9x12[];
 
 #ifdef	__cplusplus
 }
