@@ -8,9 +8,9 @@
 #ifndef LGFONT_H
 #define	LGFONT_H
 
-#include <xc.h> 
+#include <stdint.h> 
 
-extern const unsigned short Terminal12x16[];
+extern const uint8_t Terminal12x16[];
 
 #endif	/* LGFONT_H */
 
