@@ -62,7 +62,7 @@ void glcd_setfont(uint8_t * address, uint8_t offset,uint8_t xs,uint8_t ys)
     font.xs=xs;
     font.ys=ys;
     font.yb=(ys+7) / 8;
-    font.size=font.xs*font.yb+1;
+    font.size=(font.xs*font.yb)+1;
 }
 void glcd_lgtext(uint8_t x,uint8_t y,const char *tx,uint8_t c)
 {
@@ -444,8 +444,8 @@ void main(void) {
     glcd_clear();
     
     glcd_setfont(Sonic_XB, 32,26,24);
-    glcd_lgtext(6,0,"Larg",4);
-    glcd_lgtext(6,32,"Font",4);
+    glcd_lgtext(6,0,"Huge",4);
+    glcd_lgtext(6,32,"Text",4);
    
     while (1)
     {
