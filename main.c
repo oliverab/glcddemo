@@ -14,12 +14,6 @@
 #include "sonicxb.h"
 #include "term.h"
 #include "glcd_hardware.h"
-#define glcd_cs1 0b00000001
-#define glcd_cs2 0b00000010
-#define glcd_rs  0b00000100
-#define glcd_rw  0b00001000
-#define glcd_e   0b00010000
-#define glcd_rst 0b00100000
 
 #define glcdc_off 0b00111110
 #define glcdc_on 0b00111111
