@@ -11,6 +11,7 @@
 
 #include "glcd128x64/glcd_lib.h"
 #include "lgfont.h"
+#include "sonicxb.h"
 #include "glcd_hardware.h"
 #define glcd_cs1 0b00000001
 #define glcd_cs2 0b00000010
@@ -423,6 +424,16 @@ void main(void) {
     glcd_setfont(Terminal12x16, 32,12,16);
     glcd_lgtext(14,16,"Large",5);
     glcd_lgtext(28,32,"Font",4);
+   
+     for(uint8_t d=0;d<=50;d++)
+    {
+        __delay_ms(100);
+    }
+    glcd_clear();
+    
+    glcd_setfont(Sonic_XB, 32,26,24);
+    glcd_lgtext(2,8,"Larg",4);
+    glcd_lgtext(2,32,"Font",4);
    
     while (1)
     {
