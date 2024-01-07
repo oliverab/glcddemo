@@ -52,17 +52,29 @@
  */
 struct
 {
- uint8_t * address;
- uint8_t offset,xs,ys,yb,size;
+ const uint8_t * address;
+ uint8_t offset,prop,xs,ys,yb,size;
 } font ; 
-void glcd_setfont(uint8_t * address, uint8_t offset,uint8_t xs,uint8_t ys)
+void glcd_setfont(const uint8_t * address, uint8_t offset, uint8_t prop, uint8_t xs, uint8_t ys)
 {
     font.address=address;
     font.offset=offset;
+    font.prop=prop;
     font.xs=xs;
     font.ys=ys;
     font.yb=(ys+7) / 8;
     font.size=(font.xs*font.yb)+1;
+}
+uint8_t glcd_lgwide(const char *tx,uint8_t c)
+{
+    uint8_t w=0;
+    if (!font.prop) return c*font.xs;
+    for (;c>0;c--)
+    {
+        w+=font.address[(*tx-font.offset)*font.size];
+        tx++;
+    }
+    return w;
 }
 void glcd_lgtext(uint8_t x,uint8_t y,const char *tx,uint8_t c)
 {
@@ -95,8 +107,12 @@ void glcd_lgtext(uint8_t x,uint8_t y,const char *tx,uint8_t c)
     uint8_t cc;
     for (cc=c;cc>0;cc--)
     {
-        uint8_t* addr=&font.address[(*ttx-font.offset)*font.size+yb];
-        for(uint8_t d=0;d<font.xs;d++ )
+        const uint8_t* addr=&font.address[(*ttx-font.offset)*font.size];
+        ttx++;
+        uint8_t d;
+        if (font.prop) d=*addr; else d=font.xs;
+        addr+=yb;
+        for(;d>0;d-- )
         {
             glcddata_write(*addr);
             addr+=font.yb;
@@ -126,7 +142,6 @@ void glcd_lgtext(uint8_t x,uint8_t y,const char *tx,uint8_t c)
             if (xx==0x80) break;
         }
         if (xx==0x80) break;
-        ttx++;
     }
     glcdcont_unset(glcd_rs);
     y+=8;
@@ -423,7 +438,7 @@ void main(void) {
     {
         glcd_line(10,10,aa,53,1);
     }
-    glcd_setfont(Terminal12x16, 32,12,16);
+    glcd_setfont(Terminal12x16, 32, 0, 12, 16);
     glcd_lgtext(14,16,"Large",5);
     glcd_lgtext(28,32,"Font",4);
    
@@ -433,7 +448,7 @@ void main(void) {
     }
     glcd_clear();
     
-    glcd_setfont(Term9x12, 32,9,12);
+    glcd_setfont(Term9x12, 32, 0, 9, 12);
     glcd_lgtext(6,0,"Large",5);
     glcd_lgtext(6,32,"Font",4);
    
@@ -443,9 +458,12 @@ void main(void) {
     }
     glcd_clear();
     
-    glcd_setfont(Sonic_XB26x24, 32,26,24);
-    glcd_lgtext(6,0,"Huge",4);
-    glcd_lgtext(6,32,"Text",4);
+    glcd_setfont(Sonic_XB26x24, 32, 1, 26, 24);
+    const char * temp;
+    temp="Larger";
+    glcd_lgtext(64-glcd_lgwide(temp,6)/2,8,temp,6);
+    temp="Fonts";
+    glcd_lgtext(64-glcd_lgwide(temp,5)/2,32,temp,5);
    
     while (1)
     {
