@@ -12,6 +12,7 @@
       <itemPath>glcd_hardware.h</itemPath>
       <itemPath>lgfont.h</itemPath>
       <itemPath>sonicxb.h</itemPath>
+      <itemPath>term.h</itemPath>
     </logicalFolder>
     <logicalFolder name="LinkerScript"
                    displayName="Linker Files"
@@ -29,6 +30,7 @@
       <itemPath>configk42.c</itemPath>
       <itemPath>lgfont.c</itemPath>
       <itemPath>sonicxb.c</itemPath>
+      <itemPath>term.c</itemPath>
     </logicalFolder>
     <logicalFolder name="ExternalFiles"
                    displayName="Important Files"

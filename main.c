@@ -12,6 +12,7 @@
 #include "glcd128x64/glcd_lib.h"
 #include "lgfont.h"
 #include "sonicxb.h"
+#include "term.h"
 #include "glcd_hardware.h"
 #define glcd_cs1 0b00000001
 #define glcd_cs2 0b00000010
@@ -52,7 +53,7 @@
 struct
 {
  uint8_t * address;
- uint8_t offset,xs,ys,yb;
+ uint8_t offset,xs,ys,yb,size;
 } font ; 
 void glcd_setfont(uint8_t * address, uint8_t offset,uint8_t xs,uint8_t ys)
 {
@@ -61,6 +62,7 @@ void glcd_setfont(uint8_t * address, uint8_t offset,uint8_t xs,uint8_t ys)
     font.xs=xs;
     font.ys=ys;
     font.yb=(ys+7) / 8;
+    font.size=font.xs*font.yb+1;
 }
 void glcd_lgtext(uint8_t x,uint8_t y,const char *tx,uint8_t c)
 {
@@ -90,10 +92,10 @@ void glcd_lgtext(uint8_t x,uint8_t y,const char *tx,uint8_t c)
     glcdcont_set(glcd_rs);
     uint8_t xx=x;
     const char* ttx = tx;
-    uint8_t cc=c;
-    for (;cc>0;cc--)
+    uint8_t cc;
+    for (cc=c;cc>0;cc--)
     {
-        uint8_t* addr=&font.address[(unsigned short) (*ttx-font.offset)*(font.xs*font.yb+1)+yb];
+        uint8_t* addr=&font.address[(*ttx-font.offset)*font.size+yb];
         for(uint8_t d=0;d<font.xs;d++ )
         {
             glcddata_write(*addr);
@@ -431,9 +433,19 @@ void main(void) {
     }
     glcd_clear();
     
+    glcd_setfont(Term, 32,9,12);
+    glcd_lgtext(6,0,"Large",5);
+    glcd_lgtext(6,32,"Font",4);
+   
+     for(uint8_t d=0;d<=50;d++)
+    {
+        __delay_ms(100);
+    }
+    glcd_clear();
+    
     glcd_setfont(Sonic_XB, 32,26,24);
-    glcd_lgtext(2,8,"Larg",4);
-    glcd_lgtext(2,32,"Font",4);
+    glcd_lgtext(6,0,"Larg",4);
+    glcd_lgtext(6,32,"Font",4);
    
     while (1)
     {
